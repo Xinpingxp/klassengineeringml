@@ -1,0 +1,10 @@
+{
+  "DecisionTree": {
+    "accuracy": 0.425564,
+    "precision": 0.000808,
+    "recall": 0.068688,
+    "f1": 0.001598,
+    "roc_auc": 0.156883,
+    "avg_precision": 0.00506
+  }
+}

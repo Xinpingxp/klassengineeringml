@@ -1,0 +1,26 @@
+{
+  "XGBoost": {
+    "accuracy": 0.4100040820750779,
+    "precision": 0.006931086827685878,
+    "recall": 0.6125660464047783,
+    "f1": 0.01370708023512539,
+    "roc_auc": 0.6909445849463696,
+    "avg_precision": 0.032952048666690235
+  },
+  "train_samples": 500000,
+  "test_samples": 1300809,
+  "cameras_test": 8706,
+  "non_cameras_test": 1292103,
+  "confusion_matrix": [
+    [
+      528004,
+      764099
+    ],
+    [
+      3373,
+      5333
+    ]
+  ],
+  "split": "device-level 20% test; 500k stratified training subset",
+  "random_seed": 42
+}

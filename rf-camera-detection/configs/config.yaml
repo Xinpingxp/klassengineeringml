@@ -1,0 +1,156 @@
+# RF Camera Detection Pipeline Configuration
+# ==========================================
+
+# Global settings
+random_seed: 42
+device: "cpu"  # cpu or cuda
+
+# Paths
+paths:
+  data_raw: "data/raw"
+  data_processed: "data/processed"
+  outputs: "outputs"
+  models: "outputs/models"
+  plots: "outputs/plots"
+  results: "outputs/results"
+
+# =============================================================================
+# TRACK A: WiFi Traffic Analysis (UNSW IoT Dataset)
+# =============================================================================
+track_a:
+  # Dataset info
+  dataset_name: "UNSW_IoT_2018"
+  # Camera device names (to be matched against device list)
+  camera_devices:
+    - "Netatmo Welcome"
+    - "TP-Link Day Night Cloud camera"
+    - "Samsung SmartCam"
+    - "Dropcam"
+    - "Insteon Camera"
+    - "Withings Smart Baby Monitor"
+    - "Belkin Netcam"  # Note: may appear as "Belkin NetCam" or variations
+
+  # Data loading
+  flow_csv_pattern: "*.csv"  # Pattern for flow CSV files
+
+  # Feature engineering
+  features:
+    # Flow-level statistics to extract
+    packet_features: true
+    byte_features: true
+    timing_features: true
+    protocol_features: true
+    port_features: true
+
+  # Train/test split
+  split:
+    test_size: 0.2
+    val_size: 0.1  # From training set
+    split_by: "device"  # "device" or "session" to avoid leakage
+    stratify: true
+
+  # Class imbalance handling
+  imbalance:
+    method: "class_weight"  # "class_weight", "smote", "undersample", or "none"
+
+  # Model hyperparameters
+  models:
+    decision_tree:
+      criterion: "gini"
+      max_depth: 12
+      min_samples_split: 5
+      min_samples_leaf: 2
+      class_weight: "balanced"
+
+    linear_svm:
+      C: 1.0
+      max_iter: 2000
+      tol: 0.001
+      class_weight: "balanced"
+
+    logistic_regression:
+      C: 1.0
+      max_iter: 1000
+      class_weight: "balanced"
+
+    random_forest:
+      n_estimators: 100
+      max_depth: 20
+      min_samples_split: 5
+      min_samples_leaf: 2
+      class_weight: "balanced"
+      n_jobs: -1
+
+    xgboost:
+      n_estimators: 100
+      max_depth: 6
+      learning_rate: 0.1
+      subsample: 0.8
+      colsample_bytree: 0.8
+      scale_pos_weight: "auto"  # Will be computed based on class ratio
+
+    cnn_lstm:
+      # For sequence-based model
+      sequence_length: 100  # Number of packets per flow sequence
+      cnn_filters: [32, 64]
+      cnn_kernel_size: 3
+      lstm_hidden_size: 64
+      lstm_num_layers: 1
+      dropout: 0.3
+      batch_size: 64
+      epochs: 50
+      learning_rate: 0.001
+      early_stopping_patience: 10
+
+# =============================================================================
+# TRACK B: IQ Signal Analysis (Scaffold)
+# =============================================================================
+track_b:
+  # RadioML dataset for pipeline testing
+  radioml:
+    dataset_path: "data/raw/RML2016.10a_dict.pkl"
+    # Expected shape: (2, N) for I/Q channels
+
+  # SDR capture settings (TODO: configure when SDR data available)
+  sdr_capture:
+    sample_rate: 2.4e6  # 2.4 MHz
+    center_freq: 2.4e9  # 2.4 GHz
+    # TODO: Add your SDR data paths here
+    data_path: "data/raw/sdr_captures"
+    labels_file: "data/raw/sdr_captures/labels.csv"
+
+  # IQ Model architecture
+  iq_model:
+    input_channels: 2  # I and Q
+    sample_length: 1024  # Samples per segment
+    cnn_filters: [64, 128, 256]
+    cnn_kernel_size: 7
+    lstm_hidden_size: 128
+    lstm_num_layers: 2
+    dropout: 0.4
+    batch_size: 32
+    epochs: 100
+    learning_rate: 0.0001
+    early_stopping_patience: 15
+
+# =============================================================================
+# Evaluation
+# =============================================================================
+evaluation:
+  metrics:
+    - accuracy
+    - precision
+    - recall
+    - f1
+    - roc_auc
+  save_confusion_matrix: true
+  save_roc_curve: true
+  save_classification_report: true
+
+# =============================================================================
+# Logging
+# =============================================================================
+logging:
+  level: "INFO"
+  save_logs: true
+  log_file: "outputs/training.log"

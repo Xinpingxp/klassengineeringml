@@ -1,0 +1,18 @@
+{
+  "task": "camera streaming vs idle; not camera vs non-camera",
+  "camera_mac": "60:15:6f:2e:63:91",
+  "window_seconds": 5.0,
+  "split": "leave-one-session-out; all windows from each test session held out",
+  "sessions": 12,
+  "windows": 202,
+  "streaming_windows": 94,
+  "idle_windows": 108,
+  "accuracy": 0.995049504950495,
+  "balanced_accuracy": 0.9946808510638299,
+  "precision": 1.0,
+  "recall": 0.9893617021276596,
+  "f1": 0.9946524064171123,
+  "roc_auc": 0.9920212765957447,
+  "average_precision": 0.9950759878419452,
+  "warning": "Single camera, one network/channel; evaluates camera activity across sessions, not general camera identification."
+}
